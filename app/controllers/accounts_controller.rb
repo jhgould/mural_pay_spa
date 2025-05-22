@@ -3,7 +3,6 @@ class AccountsController < ApplicationController
   def new 
   end 
 
-
   def create 
     account = MuralPay::CreateAccount.new(name: account_params["name"], description: account_params["description"]).call
     
@@ -23,13 +22,10 @@ class AccountsController < ApplicationController
     end
   end 
 
-
   private 
 
   def account_params
     params.permit(:name, :description)
   end 
-
-
 
 end 
