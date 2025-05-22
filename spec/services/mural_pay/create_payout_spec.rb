@@ -4,44 +4,87 @@ RSpec.describe MuralPay::CreatePayout do
   let(:account_id) { 'abc-123' }
   let(:payload) do
     {
-      sourceAccountId: account_id,
-      payouts: [
+      "sourceAccountId": "faec0c01-a0fa-4643-ad40-16ca4c60904c",
+      "memo": "December contract",
+      "payouts": [
         {
-          amount: {
-            tokenAmount: 1000,
-            tokenSymbol: 'USDC'
+          "amount": {
+            "tokenSymbol": "USDC",
+            "tokenAmount": 100
           },
-          payoutDetails: {
-            type: 'fiat',
-            bankName: 'Test Bank',
-            bankAccountOwner: 'Test Owner'
+          "payoutDetails": {
+            "type": "fiat",
+            "bankName": "Bancamia S.A.",
+            "bankAccountOwner": "test",
+            "fiatAndRailDetails": {
+                "type": "cop",
+                "symbol": "COP",
+                "accountType": "CHECKING",
+                "phoneNumber": "+57 601 555 5555",
+                "bankAccountNumber": "1234567890123456",
+                "documentNumber": "1234563",
+                "documentType": "NATIONAL_ID"
+              }
           },
-          recipientInfo: {
-            type: 'individual',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'test@email.com',
-            dateOfBirth: '1990-01-01',
-            physicalAddress: {
-              address1: '123 Main St',
-              country: 'US',
-              state: 'CA',
-              city: 'Los Angeles',
-              zip: '90001'
+          "recipientInfo": {
+            "type": "individual",
+            "firstName": "Javier",
+            "lastName": "Gomez",
+            "email": "jgomez@gmail.com",
+            "dateOfBirth": "1980-02-22",
+            "physicalAddress": {
+              "address1": "Cra. 37 #10A 29",
+              "country": "CO",
+              "state": "Antioquia",
+              "city": "Medellin",
+              "zip": "050015"
             }
           }
         }
-      ],
-      memo: 'Test payout'
+      ]
     }
-  end
-
+  end 
   let(:response_body) do
     {
-      id: '123',
-      status: 'PENDING',
-      memo: 'Test payout'
-    }
+      "id": "37f8cfcd-e05d-4003-b77d-840f0decbbbe",
+      "createdAt": "2025-05-22T17:18:16.100Z",
+      "updatedAt": "2025-05-22T17:18:16.100Z",
+      "sourceAccountId": "faec0c01-a0fa-4643-ad40-16ca4c60904c",
+      "memo": "December contract",
+      "status": "AWAITING_EXECUTION",
+      "payouts": [
+          {
+              "id": "47e737e3-c7b5-46dd-b668-35d0d19b5e8a",
+              "createdAt": "2025-05-22T17:18:16.105Z",
+              "updatedAt": "2025-05-22T17:18:16.105Z",
+              "amount": {
+                  "tokenSymbol": "USDC",
+                  "tokenAmount": 100
+              },
+              "details": {
+                  "type": "fiat",
+                  "fiatAndRailCode": "cop",
+                  "fiatAmount": {
+                      "fiatAmount": 305421.23,
+                      "fiatCurrencyCode": "COP"
+                  },
+                  "transactionFee": {
+                      "tokenSymbol": "USDC",
+                      "tokenAmount": 0.35
+                  },
+                  "exchangeFeePercentage": 1.4,
+                  "exchangeRate": 3108.613065,
+                  "feeTotal": {
+                      "tokenSymbol": "USDC",
+                      "tokenAmount": 1.75
+                  },
+                  "fiatPayoutStatus": {
+                      "type": "created"
+                  }
+              }
+          }
+        ]
+      }
   end
 
   before do
@@ -59,9 +102,9 @@ RSpec.describe MuralPay::CreatePayout do
 
   it 'returns parsed payout data' do
     result = JSON.parse(described_class.new(payload).call)
-    expect(result["id"]).to eq('123')
-    expect(result["status"]).to eq('PENDING')
-    expect(result["memo"]).to eq('Test payout')
+    expect(result["id"]).to eq('37f8cfcd-e05d-4003-b77d-840f0decbbbe')
+    expect(result["status"]).to eq('AWAITING_EXECUTION')
+  
   end
 
   it 'raises an error when the API response is unsuccessful' do
