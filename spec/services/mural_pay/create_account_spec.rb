@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe MuralPay::CreateAccount do
   describe '#call' do
     let(:account_name) { 'Interview Test Account' }
+    let (:description) { 'This is a test account for interview purposes.' }
     let(:api_url) { 'https://api-staging.muralpay.com/api/accounts' }
     let(:fake_response) do
       {
@@ -18,7 +19,7 @@ RSpec.describe MuralPay::CreateAccount do
     before do
       stub_request(:post, api_url)
         .with(
-          body: { name: account_name }.to_json,
+          body: { name: account_name, description: description }.to_json,
           headers: {
             'Authorization' => "Bearer #{Rails.application.credentials[:mural_pay][:api_key]}",
             'Content-Type' => 'application/json',
@@ -29,7 +30,7 @@ RSpec.describe MuralPay::CreateAccount do
     end
 
     it 'returns the parsed response with account data' do
-      result = described_class.new(name: account_name).call
+      result = MuralPay::CreateAccount.new(name: account_name, description: description).call
 
       expect(result).to include(
         id: a_string_matching(/\A[0-9a-f-]+\z/),
