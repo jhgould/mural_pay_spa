@@ -1,0 +1,22 @@
+<% if accounts.present? %>
+  <div class="list-group">
+    <% accounts.each do |account| %>
+      <div class="list-group-item list-group-item-action mb-2">
+        <div class="d-flex w-100 justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-1"><%= account[:name] %></h5>
+            <p class="mb-1 text-muted small">ID: <%= account[:id] %></p>
+          </div>
+          <div class="btn-group">
+            <%= link_to "Create Payout Request", "#", class: "btn btn-sm btn-outline-primary" %>
+            <%= link_to "Execute Payout Request", "#", class: "btn btn-sm btn-outline-secondary" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    <p>You don't have any accounts yet. Create one using the form on the left.</p>
+  </div>
+<% end %>

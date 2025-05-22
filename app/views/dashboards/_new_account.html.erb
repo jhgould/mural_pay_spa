@@ -1,0 +1,19 @@
+<div class="card mb-4">
+  <div class="card-header bg-light">
+    <h5>Create New Account</h5>
+  </div>
+  <div class="card-body">
+    <div data-controller="toggle-form">
+      <button 
+        class="btn btn-primary mb-3" 
+        data-toggle-form-target="showButton"
+        data-action="click->toggle-form#showForm">
+          + New Account
+      </button>
+      
+      <div class="d-none" data-toggle-form-target="formContainer">
+        <%= render "accounts/form" %>
+      </div>
+    </div>
+  </div>
+</div>

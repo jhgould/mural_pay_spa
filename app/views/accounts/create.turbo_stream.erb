@@ -1,0 +1,7 @@
+<%= turbo_stream.update "flash-container" do %>
+  <%= render "shared/flash" %>
+<% end %>
+
+<%= turbo_stream.update "accounts-list" do %>
+  <%= render partial: "dashboards/account_list", locals: { accounts: MuralPay::GetAccounts.new.call } %>
+<% end %>
