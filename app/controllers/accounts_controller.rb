@@ -5,7 +5,7 @@ class AccountsController < ApplicationController
 
   def create 
     account = MuralPay::CreateAccount.new(name: account_params["name"], description: account_params["description"]).call
-    
+    Account.create(account_source_id: account[:id]) if account 
     respond_to do |format|
       if account
         format.html { redirect_to root_path, flash: { notice: 'Account created successfully.' } }
