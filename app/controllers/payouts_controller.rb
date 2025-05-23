@@ -13,6 +13,7 @@ class PayoutsController < ApplicationController
       redirect_to payouts_path(account.account_source_id), notice: 'Payout request created successfully.'
     else
       respond_to do |format|
+        Rails.logger.warn("Payout creation failed: #{result[:error]}")
         format.html { redirect_to root_path, alert: result[:error] }
         format.turbo_stream { redirect_to root_path, alert: result[:error] }
       end
