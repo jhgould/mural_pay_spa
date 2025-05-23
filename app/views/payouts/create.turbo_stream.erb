@@ -1,0 +1,5 @@
+<%= turbo_stream.update "flash-container" do %>
+  <%= render 'shared/flash' %>
+<% end %>
+
+<%= turbo_stream.replace "payout-request-details", partial: 'payouts/payout_request_details', locals: { payout_details: @payout_details } %>

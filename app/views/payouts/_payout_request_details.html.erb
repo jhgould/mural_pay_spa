@@ -1,0 +1,34 @@
+<%# Display payout request details %>
+<% if payout_details.present? %>
+  <div class="card mt-3">
+    <div class="card-header">
+      <h5>Payout Request Details</h5>
+    </div>
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+          <span>ID:</span>
+          <span><%= payout_details[:id] %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Status:</span>
+          <span><%= payout_details[:status] %></span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Created At:</span>
+          <span><%= Time.at(payout_details[:createdAt]/1000).strftime('%Y-%m-%d %H:%M:%S') if payout_details[:createdAt] %></span>
+        </li>
+        <% if payout_details[:amount].present? %>
+        <li class="list-group-item d-flex justify-content-between">
+          <span>Amount:</span>
+          <span><%= "#{payout_details[:amount][:tokenAmount]} #{payout_details[:amount][:tokenSymbol]}" %></span>
+        </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% else %>
+  <div class="alert alert-info">
+    No payout details available.
+  </div>
+<% end %>

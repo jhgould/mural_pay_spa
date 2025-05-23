@@ -32,37 +32,39 @@ class PayoutsController < ApplicationController
   end
 
   def create
-    account_id = params[:account_id]
+    account_id = params[:sourceAccountId]
+    memo = params[:memo]
     payload = {
       "sourceAccountId": account_id,
+      "memo": memo,
       "payouts": [
         {
           "amount": {
-            "tokenSymbol": params[:token_symbol],
-            "tokenAmount": params[:token_amount].to_f
+            "tokenSymbol": params[:tokenSymbol],
+            "tokenAmount": params[:tokenAmount].to_f
           },
           "payoutDetails": {
-            "type": params[:payout_type],
-            "bankName": params[:bank_name],
-            "bankAccountOwner": params[:bank_account_owner],
+            "type": params[:type],
+            "bankName": params[:bankName],
+            "bankAccountOwner": params[:bankAccountOwner],
             "fiatAndRailDetails": {
-              "type": params[:fiat_type],
-              "symbol": params[:fiat_symbol],
-              "accountType": params[:account_type],
-              "phoneNumber": params[:phone_number],
-              "bankAccountNumber": params[:bank_account_number],
-              "documentNumber": params[:document_number],
-              "documentType": params[:document_type]
+              "type": params[:fiatType],
+              "symbol": params[:fiatSymbol],
+              "accountType": params[:accountType],
+              "phoneNumber": params[:phoneNumber],
+              "bankAccountNumber": params[:bankAccountNumber],
+              "documentNumber": params[:documentNumber],
+              "documentType": params[:documentType]
             }
           },
           "recipientInfo": {
-            "type": params[:recipient_type],
-            "firstName": params[:first_name],
-            "lastName": params[:last_name],
+            "type": params[:recipientType],
+            "firstName": params[:firstName],
+            "lastName": params[:lastName],
             "email": params[:email],
-            "dateOfBirth": params[:date_of_birth],
+            "dateOfBirth": params[:dateOfBirth],
             "physicalAddress": {
-              "address1": params[:address],
+              "address1": params[:address1],
               "country": params[:country],
               "state": params[:state],
               "city": params[:city],
@@ -107,25 +109,26 @@ class PayoutsController < ApplicationController
 
   def payout_params
     params.permit(
-      :account_id,
-      :token_symbol,
-      :token_amount,
-      :payout_type,
-      :bank_name,
-      :bank_account_owner,
-      :fiat_type,
-      :fiat_symbol,
-      :account_type,
-      :phone_number,
-      :bank_account_number,
-      :document_number,
-      :document_type,
-      :recipient_type,
-      :first_name,
-      :last_name,
+      :sourceAccountId,
+      :memo,
+      :tokenSymbol,
+      :tokenAmount,
+      :type,
+      :bankName,
+      :bankAccountOwner,
+      :fiatType,
+      :fiatSymbol,
+      :accountType,
+      :phoneNumber,
+      :bankAccountNumber,
+      :documentNumber,
+      :documentType,
+      :recipientType,
+      :firstName,
+      :lastName,
       :email,
-      :date_of_birth,
-      :address,
+      :dateOfBirth,
+      :address1,
       :country,
       :state,
       :city,
