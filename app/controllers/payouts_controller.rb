@@ -65,7 +65,9 @@ class PayoutsController < ApplicationController
   end 
 
   def execute
+    account = PayoutRequest.find_by(payout_request_id: params[:id]).account
     MuralPay::ExecutePayoutRequest.new(id: params[:id]).call 
+    redirect_to payouts_path(account.account_source_id), flash: { notice: 'Payout request executed successfully.' }
   end 
 
 

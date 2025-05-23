@@ -7,8 +7,50 @@ RSpec.describe 'User creates payment request', type: :feature do
 
 
     allow_any_instance_of(MuralPay::GetPayoutRequest).to receive(:call).and_return(
-      status: 200, body: "", headers: {}
+      {
+          "id": "7e979839-7d43-42c8-83b8-c2eae1dcecf4",
+          "createdAt": "2025-05-23T01:19:38.449Z",
+          "updatedAt": "2025-05-23T01:19:38.449Z",
+          "transactionHash": "0x574a4c02814355e60441fd92a518ccd9a753eed93da38bbd397db91c92790f01",
+          "sourceAccountId": "39a4f7b5-7663-49d8-87be-a0afdf4c204c",
+          "memo": "December contract",
+          "status": "AWAITING_EXECUTION",
+          "payouts": [
+              {
+                  "id": "7f499808-86e5-4d03-95ac-209acfe228db",
+                  "createdAt": "2025-05-23T01:19:38.454Z",
+                  "updatedAt": "2025-05-23T03:54:39.246Z",
+                  "amount": {
+                      "tokenSymbol": "USDC",
+                      "tokenAmount": 100
+                  },
+                  "details": {
+                      "type": "fiat",
+                      "fiatAndRailCode": "cop",
+                      "fiatAmount": {
+                          "fiatAmount": 305421.23,
+                          "fiatCurrencyCode": "COP"
+                      },
+                      "transactionFee": {
+                          "tokenSymbol": "USDC",
+                          "tokenAmount": 0.35
+                      },
+                      "exchangeFeePercentage": 1.4,
+                      "exchangeRate": 3108.613065,
+                      "feeTotal": {
+                          "tokenSymbol": "USDC",
+                          "tokenAmount": 1.75
+                      },
+                      "fiatPayoutStatus": {
+                          "type": "pending",
+                          "initiatedAt": "2025-05-23T03:55:04.269Z"
+                      }
+                  }
+              }
+          ]
+      }
     )
+
 
 
     allow_any_instance_of(MuralPay::CreateAccount).to receive(:call).and_return(
@@ -49,7 +91,7 @@ RSpec.describe 'User creates payment request', type: :feature do
     
     allow_any_instance_of(MuralPay::CreatePayout).to receive(:call).and_return(
       {
-        id: "db28d5c2-1fb4-4efd-9a90-37f1fc629221",
+        id: "7e979839-7d43-42c8-83b8-c2eae1dcecf4",
         createdAt: "2025-05-22T21:53:39.984Z",
         updatedAt: "2025-05-22T21:53:39.984Z",
         sourceAccountId: "0451124b-ca4e-4d6a-8ba2-76f70df431cf",
@@ -113,7 +155,7 @@ RSpec.describe 'User creates payment request', type: :feature do
     
     click_button 'Create Payout Request'
 
-    expect(page).to have_content('db28d5c2-1fb4-4efd-9a90-37f1fc629221')
+    expect(page).to have_content('7e979839-7d43-42c8-83b8-c2eae1dcecf4')
     expect(page).to have_content('AWAITING_EXECUTION')
     expect(page).to have_content('100 USDC')
     expect(page).to have_content('Approve')

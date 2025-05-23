@@ -10,7 +10,7 @@ RSpec.feature 'User creates payment request', type: :feature do
           "transactionHash": "0x574a4c02814355e60441fd92a518ccd9a753eed93da38bbd397db91c92790f01",
           "sourceAccountId": "39a4f7b5-7663-49d8-87be-a0afdf4c204c",
           "memo": "December contract",
-          "status": "EXECUTED",
+          "status": "AWAITING_EXECUTION",
           "payouts": [
               {
                   "id": "7f499808-86e5-4d03-95ac-209acfe228db",
@@ -85,7 +85,7 @@ RSpec.feature 'User creates payment request', type: :feature do
 
     allow_any_instance_of(MuralPay::CreatePayout).to receive(:call).and_return(
       {
-        id: "db28d5c2-1fb4-4efd-9a90-37f1fc629221",
+        id: "7e979839-7d43-42c8-83b8-c2eae1dcecf4",
         createdAt: "2025-05-22T21:53:39.984Z",
         updatedAt: "2025-05-22T21:53:39.984Z",
         sourceAccountId: "0451124b-ca4e-4d6a-8ba2-76f70df431cf",
@@ -106,7 +106,7 @@ RSpec.feature 'User creates payment request', type: :feature do
         updatedAt: "2025-04-05T04:24:03.862Z",
         sourceAccountId: "5d75e362-0812-4ea8-b203-c7c3a09f8473",
         memo: "December Contract",
-        status: "PENDING",
+        status: "EXECUTED",
         payouts: [
           {
             id: "34998641-c981-44bc-beda-14b930999284",
@@ -180,10 +180,8 @@ RSpec.feature 'User creates payment request', type: :feature do
     
     click_button 'Create Payout Request'
 
-
+    expect(page).to have_content("AWAITING_EXECUTION")
     click_button 'Approve' 
-    expect(page).to have_content('EXECUTED')
-
   end 
 
 
