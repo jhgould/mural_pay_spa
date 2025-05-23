@@ -6,7 +6,7 @@
 
   <div class="form-group mb-3">
     <%= form.label :description, "Description" %>
-    <%= form.text_area :description, class: "form-control", rows: 3, data: { account_form_target: "description" } %>
+    <%= form.text_area :description, class: "form-control", required: true, rows: 3, data: { account_form_target: "description" } %>
   </div>
 
   <div class="form-feedback my-2" data-account-form-target="feedback"></div>
