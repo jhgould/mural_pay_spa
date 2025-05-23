@@ -76,33 +76,22 @@ class PayoutsController < ApplicationController
     }
 
     result = MuralPay::CreatePayout.new(payload).call
-    
-    respond_to do |format|
-      if result
-        @account = Account.find_by(account_source_id: account_id)
-        @created_payout_request = PayoutRequest.create(payout_request_id: result[:id], account: @account)
-        
-        # Get the payout details for the Turbo Stream response
-        begin
-          @payout_details = MuralPay::GetPayoutRequest.new(id: result[:id]).call
-        rescue => e
-          Rails.logger.error("Error fetching created payout request: #{e.message}")
-          @payout_details = nil
-        end
-        
-        format.html { redirect_to root_path, flash: { notice: 'Payout request created successfully.' } }
-        format.turbo_stream { 
-          flash.now[:notice] = 'Payout request created successfully.'
-          render turbo_stream: turbo_stream.replace('payout-request-details', partial: 'payouts/payout_request_details', locals: { payout_details: @payout_details })
-        }
-      else
-        format.html { redirect_to root_path, flash: { alert: 'Failed to create payout request.' } }
-        format.turbo_stream { 
-          flash.now[:alert] = 'Failed to create payout request.'
-        }
-      end
-    end
+    if result 
+      @account = Account.find_by(account_source_id: account_id)
+      @created_payout_request = PayoutRequest.create(payout_request_id: result[:id], account: @account)
+      redirect_to payouts_path(@account.account_source_id), flash: { notice: 'Payout request created successfully.' }
+    end 
   end
+
+
+
+  def index
+    account_id = params["format"]
+    payout_requests = Account.find_by(account_source_id: account_id).payout_requests
+    @payout_request_details = payout_requests.map do |payout_request|
+       MuralPay::GetPayoutRequest.new(id: payout_request.payout_request_id).call
+    end 
+  end 
 
 
   private

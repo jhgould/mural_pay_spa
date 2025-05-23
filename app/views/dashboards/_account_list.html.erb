@@ -11,11 +11,15 @@
             <%= link_to "Create Payout Request", "#", 
                 class: "btn btn-sm btn-outline-primary", 
                 data: { action: "click->payout-form#toggleForm" } %>
+            <%= link_to "Show Payout Requests", payouts_path(account[:id]), 
+                class: "btn btn-sm btn-outline-secondary" %>
           </div>
         </div>
-        
+
+
         <div class="mt-3 d-none" data-payout-form-target="form">
           <hr />
+
           <h6>Create Payout Request</h6>
           
           <%= form_with url: payouts_path, method: :post, class: "payout-form", data: { turbo: true } do |f| %>
@@ -194,11 +198,10 @@
           <% end %>
           
           <div id="payout-request-details">
-            <!-- This area will be replaced with payout request details via Turbo Stream -->
           </div>
         </div>
       </div>
-    <% end %>
+      <% end %>
   </div>
 <% else %>
   <div class="alert alert-info">
