@@ -8,7 +8,7 @@ module MuralPay
     def call
       response = MuralPayService.connection.get("/api/payouts/payout/#{@id}")
 
-      raise "Mural API error: #{response.status}" unless response.success?
+      raise MuralPay::MuralPayApiError.new(response.status, response.body) unless response.success?
 
       response.body
     end

@@ -53,14 +53,21 @@ class PayoutsController < ApplicationController
       ]
     }
 
-    result = MuralPay::CreatePayout.new(payload).call
-    if result 
-      @account = Account.find_by(account_source_id: account_id)
-      @created_payout_request = PayoutRequest.create(payout_request_id: result[:id], account: @account)
-      redirect_to payouts_path(@account.account_source_id), flash: { notice: 'Payout request created successfully.' }
-    end 
-  end
-
+    begin
+      result = MuralPay::CreatePayout.new(payload).call
+      if result
+        @account = Account.find_by(account_source_id: account_id)
+        @created_payout_request = PayoutRequest.create(payout_request_id: result[:id], account: @account)
+        redirect_to payouts_path(@account.account_source_id), flash: { notice: 'Payout request created successfully.' }
+      end
+    rescue MuralPay::MuralPayApiError => e
+      error_message = parse_mural_error_message(e.body) || "There was a problem creating your payout."
+      respond_to do |format|
+        format.html { redirect_to root_path, alert: error_message }
+        format.turbo_stream { redirect_to root_path, alert: error_message }
+      end
+    end
+  end 
 
 
   def index
@@ -73,9 +80,38 @@ class PayoutsController < ApplicationController
 
   def execute
     account = PayoutRequest.find_by(payout_request_id: params[:id]).account
-    MuralPay::ExecutePayoutRequest.new(id: params[:id]).call 
-    redirect_to payouts_path(account.account_source_id), flash: { notice: 'Payout request executed successfully.' }
-  end 
+  
+    begin
+      MuralPay::ExecutePayoutRequest.new(id: params[:id]).call
+      flash[:notice] = 'Payout request executed successfully.'
+    rescue MuralPay::MuralPayApiError => e
+      error_message = parse_mural_error_message(e.body) || "There was a problem executing your payout."
+      flash[:alert] = error_message
+    end
+  
+    redirect_to payouts_path(account.account_source_id)
+  end
+  
+  private
+  
+  def parse_mural_error_message(body)
+    if body.is_a?(Hash) && body["message"]
+      body["message"]
+    elsif body.is_a?(Hash) && body[:message]
+      body[:message]
+    elsif body.is_a?(String)
+      begin
+        json = JSON.parse(body)
+        json["message"] || json[:message]
+      rescue
+        nil
+      end
+    else
+      nil
+    end
+  end
+  
+  
 
 
   private
