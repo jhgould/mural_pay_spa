@@ -2,11 +2,41 @@
   <div class="list-group">
     <% accounts.each do |account| %>
       <div class="list-group-item list-group-item-action mb-2" data-controller="payout-form">
-        <div class="d-flex w-100 justify-content-between align-items-center">
+        <div class="d-flex w-100 justify-content-between align-items-start">
           <div>
             <h5 class="mb-1"><%= account[:name] %></h5>
             <p class="mb-1 text-muted small">ID: <%= account[:id] %></p>
+            <p class="mb-1">
+              <strong>Balance:</strong>
+              <% if account.dig(:accountDetails, :balances)&.any? %>
+                <% account[:accountDetails][:balances].each do |bal| %>
+                  <span class="badge bg-light text-dark"><%= bal[:tokenAmount] %> <%= bal[:tokenSymbol] %></span>
+                <% end %>
+              <% else %>
+                <span class="text-muted">N/A</span>
+              <% end %>
+            </p>
+            <% if account.dig(:accountDetails, :depositAccount) %>
+              <div class="mb-1">
+                <strong>Bank:</strong> <%= account[:accountDetails][:depositAccount][:bankName] %>
+                <br/>
+                <button class="btn btn-link btn-sm p-0 mt-1" type="button" data-bs-toggle="collapse" data-bs-target="#bank-details-<%= account[:id] %>" aria-expanded="false" aria-controls="bank-details-<%= account[:id] %>">
+                  Show Account & Routing
+                </button>
+                <div class="collapse" id="bank-details-<%= account[:id] %>">
+                  <span class="text-muted small">
+                    Account #: <%= account[:accountDetails][:depositAccount][:bankAccountNumber] %><br/>
+                    Routing #: <%= account[:accountDetails][:depositAccount][:bankRoutingNumber] %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
           </div>
+          <div class="text-end ms-3" style="min-width: 120px;">
+            <span class="badge bg-success mb-2" style="font-size: 1rem;"><%= account[:status] %></span>
+          </div>
+        </div>
+        <div class="d-flex w-100 justify-content-end align-items-center mt-2">
           <div class="btn-group">
             <%= link_to "Create Payout Request", "#", 
                 class: "btn btn-sm btn-outline-primary", 
@@ -24,18 +54,17 @@
           
           <%= form_with url: payouts_path, method: :post, class: "payout-form", data: { turbo: true } do |f| %>
             <%= f.hidden_field :sourceAccountId, value: account[:id] %>
-            <%= f.hidden_field :memo, value: "December contract" %>
             
             <div class="row mb-3">
               <div class="col-md-6">
                 <h6 class="mb-2">Amount Details</h6>
                 <div class="mb-2">
                   <%= f.label :tokenSymbol, "Token Symbol", class: "form-label" %>
-                  <%= f.text_field :tokenSymbol, class: "form-control", placeholder: "USDC", value: "USDC" %>
+                  <%= f.text_field :tokenSymbol, class: "form-control", required: true %>
                 </div>
                 <div class="mb-2">
                   <%= f.label :tokenAmount, "Token Amount", class: "form-label" %>
-                  <%= f.number_field :tokenAmount, class: "form-control", step: "0.01", placeholder: "100" %>
+                  <%= f.number_field :tokenAmount, class: "form-control", step: "0.01", required: true %>
                 </div>
               </div>
             </div>
@@ -49,13 +78,13 @@
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :bankName, "Bank Name", class: "form-label" %>
-                      <%= f.text_field :bankName, class: "form-control", placeholder: "Bancamia S.A." %>
+                      <%= f.text_field :bankName, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :bankAccountOwner, "Bank Account Owner", class: "form-label" %>
-                      <%= f.text_field :bankAccountOwner, class: "form-control" %>
+                      <%= f.text_field :bankAccountOwner, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
@@ -64,13 +93,13 @@
                   <div class="col-md-4">
                     <div class="mb-2">
                       <%= f.label :fiatType, "Fiat Type", class: "form-label" %>
-                      <%= f.text_field :fiatType, class: "form-control", value: "cop" %>
+                      <%= f.text_field :fiatType, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="mb-2">
                       <%= f.label :fiatSymbol, "Fiat Symbol", class: "form-label" %>
-                      <%= f.text_field :fiatSymbol, class: "form-control", value: "COP" %>
+                      <%= f.text_field :fiatSymbol, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -78,7 +107,7 @@
                       <%= f.label :accountType, "Account Type", class: "form-label" %>
                       <%= f.select :accountType, 
                           options_for_select([["Checking", "CHECKING"], ["Savings", "SAVINGS"]]), 
-                          {}, { class: "form-select" } %>
+                          {}, { class: "form-select", required: true } %>
                     </div>
                   </div>
                 </div>
@@ -87,13 +116,13 @@
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :phoneNumber, "Phone Number", class: "form-label" %>
-                      <%= f.telephone_field :phoneNumber, class: "form-control", placeholder: "+57 601 555 5555" %>
+                      <%= f.telephone_field :phoneNumber, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :bankAccountNumber, "Bank Account Number", class: "form-label" %>
-                      <%= f.text_field :bankAccountNumber, class: "form-control" %>
+                      <%= f.text_field :bankAccountNumber, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
@@ -102,7 +131,7 @@
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :documentNumber, "Document Number", class: "form-label" %>
-                      <%= f.text_field :documentNumber, class: "form-control" %>
+                      <%= f.text_field :documentNumber, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-6">
@@ -110,7 +139,7 @@
                       <%= f.label :documentType, "Document Type", class: "form-label" %>
                       <%= f.select :documentType, 
                           options_for_select([["National ID", "NATIONAL_ID"], ["Passport", "PASSPORT"]]), 
-                          {}, { class: "form-select" } %>
+                          {}, { class: "form-select", required: true } %>
                     </div>
                   </div>
                 </div>
@@ -126,13 +155,13 @@
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :firstName, "First Name", class: "form-label" %>
-                      <%= f.text_field :firstName, class: "form-control" %>
+                      <%= f.text_field :firstName, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :lastName, "Last Name", class: "form-label" %>
-                      <%= f.text_field :lastName, class: "form-control" %>
+                      <%= f.text_field :lastName, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
@@ -141,13 +170,13 @@
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :email, "Email", class: "form-label" %>
-                      <%= f.email_field :email, class: "form-control" %>
+                      <%= f.email_field :email, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-2">
                       <%= f.label :dateOfBirth, "Date of Birth", class: "form-label" %>
-                      <%= f.date_field :dateOfBirth, class: "form-control" %>
+                      <%= f.date_field :dateOfBirth, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
@@ -157,7 +186,7 @@
                   <div class="col-md-12">
                     <div class="mb-2">
                       <%= f.label :address1, "Address", class: "form-label" %>
-                      <%= f.text_field :address1, class: "form-control" %>
+                      <%= f.text_field :address1, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
@@ -166,28 +195,46 @@
                   <div class="col-md-3">
                     <div class="mb-2">
                       <%= f.label :country, "Country", class: "form-label" %>
-                      <%= f.text_field :country, class: "form-control", placeholder: "CO" %>
+                      <%= f.text_field :country, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="mb-2">
                       <%= f.label :state, "State", class: "form-label" %>
-                      <%= f.text_field :state, class: "form-control", placeholder: "Antioquia" %>
+                      <%= f.text_field :state, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="mb-2">
                       <%= f.label :city, "City", class: "form-label" %>
-                      <%= f.text_field :city, class: "form-control" %>
+                      <%= f.text_field :city, class: "form-control", required: true %>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="mb-2">
                       <%= f.label :zip, "Zip Code", class: "form-label" %>
-                      <%= f.text_field :zip, class: "form-control" %>
+                      <%= f.text_field :zip, class: "form-control", required: true %>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            
+            <div class="mb-3">
+              <%= f.label :memo, "Memo", class: "form-label" %>
+              <%= f.text_field :memo, class: "form-control", required: true %>
+            </div>
+            
+            <div class="mb-3 mt-2">
+              <label class="form-label">Would you like to translate this memo for the recipient?</label>
+              <div>
+                <%= f.radio_button :translate_memo, "main_language", required: true %>
+                <%= f.label :translate_memo_main_language, "Yes, the country's main language", class: "form-check-label ms-1 me-3" %>
+                <%= f.radio_button :translate_memo, "no", required: true %>
+                <%= f.label :translate_memo_no, "No", class: "form-check-label ms-1 me-3" %>
+                <%= f.radio_button :translate_memo, "other_language", required: true %>
+                <%= f.label :translate_memo_other_language, "Yes, but choose another language", class: "form-check-label ms-1" %>
+                <%= f.text_field :translate_memo_language, class: "form-control mt-2", placeholder: "Enter language (optional)", required: false, id: "translate-memo-language-field" %>
               </div>
             </div>
             
