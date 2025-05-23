@@ -2,35 +2,6 @@ class PayoutsController < ApplicationController
   def new
   end
   
-  def execute
-    payout_id = params[:id]
-    
-    begin
-      # Call the API to execute the payout
-      MuralPay::ExecutePayoutRequest.new(id: payout_id).call
-      
-      respond_to do |format|
-        format.html { 
-          flash[:notice] = "Payout #{payout_id} execution initiated successfully!"
-          redirect_to root_path
-        }
-        format.turbo_stream {
-          flash.now[:notice] = "Payout #{payout_id} execution initiated successfully!"
-        }
-      end
-    rescue => e
-      respond_to do |format|
-        format.html { 
-          flash[:alert] = "Error executing payout: #{e.message}"
-          redirect_to root_path
-        }
-        format.turbo_stream {
-          flash.now[:alert] = "Error executing payout: #{e.message}"
-        }
-      end
-    end
-  end
-
   def create
     account_id = params[:sourceAccountId]
     memo = params[:memo]
@@ -91,6 +62,10 @@ class PayoutsController < ApplicationController
     @payout_request_details = payout_requests.map do |payout_request|
        MuralPay::GetPayoutRequest.new(id: payout_request.payout_request_id).call
     end 
+  end 
+
+  def execute
+    MuralPay::ExecutePayoutRequest.new(id: params[:id]).call 
   end 
 
 
