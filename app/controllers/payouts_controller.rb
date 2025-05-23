@@ -5,9 +5,16 @@ class PayoutsController < ApplicationController
   def create
     account_id = params[:sourceAccountId]
     memo = params[:memo]
+    if  params[:translate_memo] == "main_language"
+      translated_memo = OpenAi::OpenAiService.new.translate(params[:memo], language: params[:country]) 
+    elsif params[:translate_memo] == "other_language"
+      translated_memo = OpenAi::OpenAiService.new.translate(params[:memo], language: params[:translate_memo_language]) 
+    else 
+      translated_memo = ""
+    end 
     payload = {
       "sourceAccountId": account_id,
-      "memo": memo,
+      "memo": {memo: memo, translated_memo: translated_memo}.to_s,
       "payouts": [
         {
           "amount": {
@@ -72,6 +79,7 @@ class PayoutsController < ApplicationController
 
 
   private
+
 
   def payout_params
     params.permit(
