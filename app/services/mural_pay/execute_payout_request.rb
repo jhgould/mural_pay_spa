@@ -8,7 +8,6 @@ module MuralPay
       response = connection.post("/api/payouts/payout/#{@id}/execute")
       
       unless response.success?
-        # Raise your custom error class
         raise MuralPay::MuralPayApiError.new(response.status, response.body)
       end
 
