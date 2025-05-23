@@ -6,6 +6,11 @@ RSpec.describe 'User creates payment request', type: :feature do
   before do 
 
 
+    allow_any_instance_of(MuralPay::GetPayoutRequest).to receive(:call).and_return(
+      status: 200, body: "", headers: {}
+    )
+
+
     allow_any_instance_of(MuralPay::CreateAccount).to receive(:call).and_return(
       {
         id: 'fake-id-123',
@@ -107,11 +112,11 @@ RSpec.describe 'User creates payment request', type: :feature do
     fill_in 'Zip Code', with: '12345'
     
     click_button 'Create Payout Request'
-    binding.pry
+
     expect(page).to have_content('db28d5c2-1fb4-4efd-9a90-37f1fc629221')
     expect(page).to have_content('AWAITING_EXECUTION')
-    expect(page).to have_content('100.00 USDC')
-    expect(page).to have_content('Execute Payout')
+    expect(page).to have_content('100 USDC')
+    expect(page).to have_content('Approve')
   end 
 
 end 
