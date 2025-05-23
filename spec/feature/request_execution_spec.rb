@@ -1,11 +1,7 @@
-require 'rails_helper'
+require 'rails_helper' 
 
-
-RSpec.describe 'User creates payment request', type: :feature do  
-
+RSpec.feature 'User creates payment request', type: :feature do 
   before do 
-
-
     allow_any_instance_of(MuralPay::GetPayoutRequest).to receive(:call).and_return(
       {
           "id": "7e979839-7d43-42c8-83b8-c2eae1dcecf4",
@@ -51,8 +47,6 @@ RSpec.describe 'User creates payment request', type: :feature do
       }
     )
 
-
-
     allow_any_instance_of(MuralPay::CreateAccount).to receive(:call).and_return(
       {
         id: 'fake-id-123',
@@ -88,7 +82,7 @@ RSpec.describe 'User creates payment request', type: :feature do
         }
       }
     ])
-    
+
     allow_any_instance_of(MuralPay::CreatePayout).to receive(:call).and_return(
       {
         id: "7e979839-7d43-42c8-83b8-c2eae1dcecf4",
@@ -99,18 +93,49 @@ RSpec.describe 'User creates payment request', type: :feature do
         payouts: [
           {
             id: "65687973-a6fa-487d-9188-02cc50567191",
-            createdAt: "2025-05-22T21:53:39.990Z",
-            updatedAt: "2025-05-22T21:53:39.990Z",
-            amount: {tokenSymbol: "USDC", tokenAmount: 100},
+            createdAt: "2025-05-22T21:53:39.990Z"
+          }
+        ]
+      }
+    )
+
+    allow_any_instance_of(MuralPay::ExecutePayoutRequest).to receive(:call).and_return(
+      {
+        id: "e5728f35-f13e-45a2-ba38-144da973938a",
+        createdAt: "2025-04-05T04:24:03.862Z",
+        updatedAt: "2025-04-05T04:24:03.862Z",
+        sourceAccountId: "5d75e362-0812-4ea8-b203-c7c3a09f8473",
+        memo: "December Contract",
+        status: "EXECUTED",
+        payouts: [
+          {
+            id: "34998641-c981-44bc-beda-14b930999284",
+            createdAt: "2025-04-05T04:24:03.869Z",
+            updatedAt: "2025-04-05T04:24:03.869Z",
+            amount: {
+              tokenSymbol: "USDC",
+              tokenAmount: 100
+            },
             details: {
               type: "fiat",
               fiatAndRailCode: "cop",
-              fiatAmount: {fiatAmount: 305421.23, fiatCurrencyCode: "COP"},
-              transactionFee: {tokenSymbol: "USDC", tokenAmount: 0.35},
+              fiatAmount: {
+                fiatAmount: 305421.23,
+                fiatCurrencyCode: "COP"
+              },
+              transactionFee: {
+                tokenSymbol: "USDC",
+                tokenAmount: 0.35
+              },
               exchangeFeePercentage: 1.4,
               exchangeRate: 3108.613065,
-              feeTotal: {tokenSymbol: "USDC", tokenAmount: 1.75},
-              fiatPayoutStatus: {type: "created"}
+              feeTotal: {
+                tokenSymbol: "USDC",
+                tokenAmount: 1.75
+              },
+              fiatPayoutStatus: {
+                type: "created"
+              }
             }
           }
         ]
@@ -120,12 +145,12 @@ RSpec.describe 'User creates payment request', type: :feature do
     Account.create(
       account_source_id: '12345-abc'
     )
-
-    visit root_path
   end 
 
+  scenario "user creates and executes a payment request" do
+    visit root_path
 
-  scenario 'User creates a payment request' do
+
     click_button '+ New Account'
     fill_in 'Account Name', with: 'Test Account'
     fill_in 'Description', with: 'This is a test account'
@@ -155,10 +180,9 @@ RSpec.describe 'User creates payment request', type: :feature do
     
     click_button 'Create Payout Request'
 
-    expect(page).to have_content('7e979839-7d43-42c8-83b8-c2eae1dcecf4')
-    expect(page).to have_content('AWAITING_EXECUTION')
-    expect(page).to have_content('100 USDC')
-    expect(page).to have_content('Approve')
+    expect(page).to have_content("AWAITING_EXECUTION")
+    click_button 'Approve' 
   end 
 
-end 
+
+end

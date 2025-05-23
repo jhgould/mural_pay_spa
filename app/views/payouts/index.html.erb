@@ -16,8 +16,9 @@
                 <%= payout[:status] %>
               </span>
               <div class="d-flex gap-2 mt-3">
-                <button class="btn btn-outline-primary btn-sm">Approve</button>
-                <button class="btn btn-outline-danger btn-sm">Cancel</button>
+                <%if payout[:status] != "EXECUTED"  %>
+                  <%= button_to "Approve", execute_payout_path(payout[:id]), method: :post, class: "btn btn-outline-primary btn-sm" %>
+                <% end %>
               </div>
             </div>
           </div>
