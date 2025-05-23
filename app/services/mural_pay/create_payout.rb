@@ -10,7 +10,7 @@ module MuralPay
       response = connection.post(ENDPOINT, @payload)
 
       unless response.success?
-        raise "Mural API error (#{response.status}): #{response.body}"
+        raise MuralPay::MuralPayApiError.new(response.status, response.body)
       end
 
       response.body
